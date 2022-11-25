@@ -1,5 +1,5 @@
 # Meta_diseases_analyses
-Disease types included:\ 
+Disease types included: \
 Alzheimer's Disease(AD),\
 Mutiple Sclerosis(MS),\
 Type 2 Diabetes(T2D),\
