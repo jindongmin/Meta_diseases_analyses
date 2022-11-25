@@ -1,6 +1,6 @@
 # Meta_diseases_analyses
 Disease types included: 
-Alzheimer's Disease(AD),
+Alzheimer's Disease(AD) \n
 Mutiple Sclerosis(MS),
 Type 2 Diabetes(T2D),
 Autism Spectrum Disorder (ASD),
