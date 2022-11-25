@@ -4,7 +4,8 @@ Alzheimer's Disease(AD),
 Mutiple Sclerosis(MS),
 Type 2 Diabetes(T2D),
 Autism Spectrum Disorder (ASD),
-Inflammatory Bowel Disease (IBD),
+Inflammatory Bowel Disease (IBD):Crohn’s Disease (CD),Ulcerative Colitis (UC),
 Schizophrenia,
 Parkinson's Disease(PD),
-Type 1 Diabetes(T1D).
+Type 1 Diabetes(T1D),
+Obesity.
