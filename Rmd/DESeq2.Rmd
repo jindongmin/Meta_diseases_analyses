@@ -9,3 +9,521 @@ date: "2022-11-24"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+```{r}
+#load DESeq2
+library(DESeq2)
+```
+
+```{r}
+#load table Dan et al
+ASV_table <- read.table('../../Combined_datasets/biom_to_txt/Dan2020ASD.txt', sep="\t", skip=1, header=T, row.names = 1,comment.char = "", quote="", check.names = F)
+#load metadata
+groupings <- read.table('../../Combined_datasets/Dan_metadata_simple.txt', sep="\t", row.names = 1, header=T, comment.char = "", quote="", check.names = F)
+sample_num <- length(colnames(ASV_table))
+grouping_num <- length(rownames(groupings))
+```
+
+```{r}
+colnames(groupings)[1] <- "Groupings"
+```
+
+```{r}
+if(identical(colnames(ASV_table), rownames(groupings))==T){
+  message("Groupings and ASV table are in the same order")
+}else{
+  rows_to_keep <- intersect(colnames(ASV_table), rownames(groupings))
+  groupings <- groupings[rows_to_keep,,drop=F]
+  ASV_table <- ASV_table[,rows_to_keep]
+  if(identical(colnames(ASV_table), rownames(groupings))==T){
+    message("Groupings table was re-arrange to be in the same order as the ASV table")
+    message("A total of ", sample_num-length(colnames(ASV_table)), " from the ASV_table")
+    message("A total of ", grouping_num-length(rownames(groupings)), " from the groupings table")
+  }else{
+    stop("Unable to match samples between the ASV table and groupings table")
+  }
+}
+```
+
+```{r}
+dds <- DESeqDataSetFromMatrix(countData = ASV_table,
+                              colData=groupings,
+                              design = ~ Groupings)
+```
+```{r}
+dds <- DESeq(dds)
+```
+```{r}
+res <- results(dds, name="Groupings_Healthy_vs_ASD")
+```
+
+```{r}
+res
+```
+
+```{r}
+#order results by smallest pvalue
+resOrdered <- res[order(res$pvalue),]
+```
+
+```{r}
+summary(res)
+
+```
+
+```{r}
+sum(res$padj < 0.001, na.rm=TRUE)
+```
+```{r}
+resSig <- subset(resOrdered, padj < 0.001)
+resSig
+```
+
+```{r}
+write.table(resSig, file='../table/Dan_deseq2.txt', quote=FALSE, sep="\t", col.names = NA)
+```
+
+```{r}
+plotCounts(dds, gene=which.min(res$padj), intgroup="Groupings")
+```
+
+```{r}
+plotCounts(dds, gene='Desulfovibrio piger', intgroup="Groupings")
+```
+```{r}
+#load table QinT2D
+ASV_table <- read.table('../../Combined_datasets/biom_to_txt/Qin2012T2D.txt', sep="\t", skip=1, header=T, row.names = 1,comment.char = "", quote="", check.names = F)
+#load metadata
+groupings <- read.table('../../Combined_datasets/metadata.txt', sep="\t", row.names = 1, header=T, comment.char = "", quote="", check.names = F)
+sample_num <- length(colnames(ASV_table))
+grouping_num <- length(rownames(groupings))
+colnames(groupings)[1] <- "Groupings"
+
+if(identical(colnames(ASV_table), rownames(groupings))==T){
+  message("Groupings and ASV table are in the same order")
+}else{
+  rows_to_keep <- intersect(colnames(ASV_table), rownames(groupings))
+  groupings <- groupings[rows_to_keep,,drop=F]
+  ASV_table <- ASV_table[,rows_to_keep]
+  if(identical(colnames(ASV_table), rownames(groupings))==T){
+    message("Groupings table was re-arrange to be in the same order as the ASV table")
+    message("A total of ", sample_num-length(colnames(ASV_table)), " from the ASV_table")
+    message("A total of ", grouping_num-length(rownames(groupings)), " from the groupings table")
+  }else{
+    stop("Unable to match samples between the ASV table and groupings table")
+  }
+}
+dds <- DESeqDataSetFromMatrix(countData = ASV_table,
+                              colData=groupings,
+                              design = ~ Groupings)
+dds <- DESeq(dds)
+#res <- results(dds, name="Groupings_Healthy_vs_T2D")
+
+res <- results(dds, contrast=c("Groupings","Healthy","T2D"))
+summary(res)
+resOrdered <- res[order(res$pvalue),]
+resSig <- subset(resOrdered, padj < 0.001)
+resSig
+```
+
+```{r}
+write.table(resSig, file='../table/QinT2D_deseq2.txt', quote=FALSE, sep="\t", col.names = NA)
+```
+
+```{r}
+plotCounts(dds, gene='CAG-1427 sp900546175', intgroup="Groupings")
+```
+```{r}
+plotCounts(dds, gene='Acetomicrobium hydrogeniformans', intgroup="Groupings")
+```
+
+```{r}
+plotCounts(dds, gene='UMGS363 sp900550695', intgroup="Groupings")
+```
+
+
+```{r}
+#Wang_ASD
+#load table
+ASV_table <- read.table('../../Combined_datasets/biom_to_txt/Wang2020ASD.txt', sep="\t", skip=1, header=T, row.names = 1,comment.char = "", quote="", check.names = F)
+#load metadata
+groupings <- read.table('../../Combined_datasets/metadata.txt', sep="\t", row.names = 1, header=T, comment.char = "", quote="", check.names = F)
+sample_num <- length(colnames(ASV_table))
+grouping_num <- length(rownames(groupings))
+colnames(groupings)[1] <- "Groupings"
+if(identical(colnames(ASV_table), rownames(groupings))==T){
+  message("Groupings and ASV table are in the same order")
+}else{
+  rows_to_keep <- intersect(colnames(ASV_table), rownames(groupings))
+  groupings <- groupings[rows_to_keep,,drop=F]
+  ASV_table <- ASV_table[,rows_to_keep]
+  if(identical(colnames(ASV_table), rownames(groupings))==T){
+    message("Groupings table was re-arrange to be in the same order as the ASV table")
+    message("A total of ", sample_num-length(colnames(ASV_table)), " from the ASV_table")
+    message("A total of ", grouping_num-length(rownames(groupings)), " from the groupings table")
+  }else{
+    stop("Unable to match samples between the ASV table and groupings table")
+  }
+}
+
+dds <- DESeqDataSetFromMatrix(countData = ASV_table,
+                              colData=groupings,
+                              design = ~ Groupings)
+
+dds <- DESeq(dds)
+res <- results(dds, contrast=c("Groupings","Healthy","ASD"))
+summary(res)
+resOrdered <- res[order(res$pvalue),]
+resSig <- subset(resOrdered, padj < 0.001)
+resSig
+```
+```{r}
+write.table(resSig, file='../table/Wang_ASD_deseq2.txt', quote=FALSE, sep="\t", col.names = NA)
+```
+
+```{r}
+#Dan_n_Wang_ASD
+#load table
+ASV_table <- read.table('../../Combined_datasets/biom_to_txt/Dan_n_Wang.txt', sep="\t", skip=1, header=T, row.names = 1,comment.char = "", quote="", check.names = F)
+#load metadata
+groupings <- read.table('../../Combined_datasets/metadata.txt', sep="\t", row.names = 1, header=T, comment.char = "", quote="", check.names = F)
+sample_num <- length(colnames(ASV_table))
+grouping_num <- length(rownames(groupings))
+colnames(groupings)[1] <- "Groupings"
+if(identical(colnames(ASV_table), rownames(groupings))==T){
+  message("Groupings and ASV table are in the same order")
+}else{
+  rows_to_keep <- intersect(colnames(ASV_table), rownames(groupings))
+  groupings <- groupings[rows_to_keep,,drop=F]
+  ASV_table <- ASV_table[,rows_to_keep]
+  if(identical(colnames(ASV_table), rownames(groupings))==T){
+    message("Groupings table was re-arrange to be in the same order as the ASV table")
+    message("A total of ", sample_num-length(colnames(ASV_table)), " from the ASV_table")
+    message("A total of ", grouping_num-length(rownames(groupings)), " from the groupings table")
+  }else{
+    stop("Unable to match samples between the ASV table and groupings table")
+  }
+}
+
+dds <- DESeqDataSetFromMatrix(countData = ASV_table,
+                              colData=groupings,
+                              design = ~ Groupings)
+
+dds <- DESeq(dds)
+res <- results(dds, contrast=c("Groupings","Healthy","ASD"))
+summary(res)
+resOrdered <- res[order(res$pvalue),]
+resSig <- subset(resOrdered, padj < 0.001)
+resSig
+```
+
+```{r}
+write.table(resSig, file='../table/Dan_n_Wang_ASD_deseq2.txt', quote=FALSE, sep="\t", col.names = NA)
+```
+
+```{r}
+#Laske_AD
+#load table
+ASV_table <- read.table('../../Combined_datasets/biom_to_txt/Laske2022AD.txt', sep="\t", skip=1, header=T, row.names = 1,comment.char = "", quote="", check.names = F)
+#load metadata
+groupings <- read.table('../../Combined_datasets/metadata.txt', sep="\t", row.names = 1, header=T, comment.char = "", quote="", check.names = F)
+sample_num <- length(colnames(ASV_table))
+grouping_num <- length(rownames(groupings))
+colnames(groupings)[1] <- "Groupings"
+if(identical(colnames(ASV_table), rownames(groupings))==T){
+  message("Groupings and ASV table are in the same order")
+}else{
+  rows_to_keep <- intersect(colnames(ASV_table), rownames(groupings))
+  groupings <- groupings[rows_to_keep,,drop=F]
+  ASV_table <- ASV_table[,rows_to_keep]
+  if(identical(colnames(ASV_table), rownames(groupings))==T){
+    message("Groupings table was re-arrange to be in the same order as the ASV table")
+    message("A total of ", sample_num-length(colnames(ASV_table)), " from the ASV_table")
+    message("A total of ", grouping_num-length(rownames(groupings)), " from the groupings table")
+  }else{
+    stop("Unable to match samples between the ASV table and groupings table")
+  }
+}
+
+dds <- DESeqDataSetFromMatrix(countData = ASV_table,
+                              colData=groupings,
+                              design = ~ Groupings)
+
+dds <- DESeq(dds)
+res <- results(dds, contrast=c("Groupings","Healthy","AD"))
+summary(res)
+resOrdered <- res[order(res$pvalue),]
+resSig <- subset(resOrdered, padj < 0.001)
+resSig
+```
+
+```{r}
+write.table(resSig, file='../table/Laske_AD_deseq2.txt', quote=FALSE, sep="\t", col.names = NA)
+```
+
+```{r}
+#iMSMS_MS
+#load table
+ASV_table <- read.table('../../Combined_datasets/biom_to_txt/iMSMS2021MS.txt', sep="\t", skip=1, header=T, row.names = 1,comment.char = "", quote="", check.names = F)
+#load metadata
+groupings <- read.table('../../Combined_datasets/metadata.txt', sep="\t", row.names = 1, header=T, comment.char = "", quote="", check.names = F)
+sample_num <- length(colnames(ASV_table))
+grouping_num <- length(rownames(groupings))
+colnames(groupings)[1] <- "Groupings"
+if(identical(colnames(ASV_table), rownames(groupings))==T){
+  message("Groupings and ASV table are in the same order")
+}else{
+  rows_to_keep <- intersect(colnames(ASV_table), rownames(groupings))
+  groupings <- groupings[rows_to_keep,,drop=F]
+  ASV_table <- ASV_table[,rows_to_keep]
+  if(identical(colnames(ASV_table), rownames(groupings))==T){
+    message("Groupings table was re-arrange to be in the same order as the ASV table")
+    message("A total of ", sample_num-length(colnames(ASV_table)), " from the ASV_table")
+    message("A total of ", grouping_num-length(rownames(groupings)), " from the groupings table")
+  }else{
+    stop("Unable to match samples between the ASV table and groupings table")
+  }
+}
+
+dds <- DESeqDataSetFromMatrix(countData = ASV_table,
+                              colData=groupings,
+                              design = ~ Groupings)
+
+dds <- DESeq(dds)
+res <- results(dds, contrast=c("Groupings","Healthy","MS"))
+summary(res)
+resOrdered <- res[order(res$pvalue),]
+resSig <- subset(resOrdered, padj < 0.001)
+resSig
+
+write.table(resSig, file='../table/iMSMS_MS_deseq2.txt', quote=FALSE, sep="\t", col.names = NA)
+```
+
+```{r}
+#Franzosa_CD
+#load table
+ASV_table <- read.table('../../Combined_datasets/biom_to_txt/Franzosa2019IBD_CD.txt', sep="\t", skip=1, header=T, row.names = 1,comment.char = "", quote="", check.names = F)
+#load metadata
+groupings <- read.table('../../Combined_datasets/metadata.txt', sep="\t", row.names = 1, header=T, comment.char = "", quote="", check.names = F)
+sample_num <- length(colnames(ASV_table))
+grouping_num <- length(rownames(groupings))
+colnames(groupings)[1] <- "Groupings"
+if(identical(colnames(ASV_table), rownames(groupings))==T){
+  message("Groupings and ASV table are in the same order")
+}else{
+  rows_to_keep <- intersect(colnames(ASV_table), rownames(groupings))
+  groupings <- groupings[rows_to_keep,,drop=F]
+  ASV_table <- ASV_table[,rows_to_keep]
+  if(identical(colnames(ASV_table), rownames(groupings))==T){
+    message("Groupings table was re-arrange to be in the same order as the ASV table")
+    message("A total of ", sample_num-length(colnames(ASV_table)), " from the ASV_table")
+    message("A total of ", grouping_num-length(rownames(groupings)), " from the groupings table")
+  }else{
+    stop("Unable to match samples between the ASV table and groupings table")
+  }
+}
+
+dds <- DESeqDataSetFromMatrix(countData = ASV_table,
+                              colData=groupings,
+                              design = ~ Groupings)
+
+dds <- DESeq(dds)
+res <- results(dds, contrast=c("Groupings","Healthy","CD"))
+summary(res)
+resOrdered <- res[order(res$pvalue),]
+resSig <- subset(resOrdered, padj < 0.001)
+resSig
+
+write.table(resSig, file='../table/Franzosa_CD_deseq2.txt', quote=FALSE, sep="\t", col.names = NA)
+```
+
+```{r}
+#Zhu_Schizophrenia
+#load table
+ASV_table <- read.table('../../Combined_datasets/biom_to_txt/Zhu2020Schizophrenia.txt', sep="\t", skip=1, header=T, row.names = 1,comment.char = "", quote="", check.names = F)
+#load metadata
+groupings <- read.table('../../Combined_datasets/metadata.txt', sep="\t", row.names = 1, header=T, comment.char = "", quote="", check.names = F)
+sample_num <- length(colnames(ASV_table))
+grouping_num <- length(rownames(groupings))
+colnames(groupings)[1] <- "Groupings"
+if(identical(colnames(ASV_table), rownames(groupings))==T){
+  message("Groupings and ASV table are in the same order")
+}else{
+  rows_to_keep <- intersect(colnames(ASV_table), rownames(groupings))
+  groupings <- groupings[rows_to_keep,,drop=F]
+  ASV_table <- ASV_table[,rows_to_keep]
+  if(identical(colnames(ASV_table), rownames(groupings))==T){
+    message("Groupings table was re-arrange to be in the same order as the ASV table")
+    message("A total of ", sample_num-length(colnames(ASV_table)), " from the ASV_table")
+    message("A total of ", grouping_num-length(rownames(groupings)), " from the groupings table")
+  }else{
+    stop("Unable to match samples between the ASV table and groupings table")
+  }
+}
+
+dds <- DESeqDataSetFromMatrix(countData = ASV_table,
+                              colData=groupings,
+                              design = ~ Groupings)
+
+dds <- DESeq(dds)
+res <- results(dds, contrast=c("Groupings","Healthy","Schizophrenia"))
+summary(res)
+resOrdered <- res[order(res$pvalue),]
+resSig <- subset(resOrdered, padj < 0.001)
+resSig
+
+write.table(resSig, file='../table/Zhu_Schizophrenia_deseq2.txt', quote=FALSE, sep="\t", col.names = NA)
+```
+
+```{r}
+#Nielsen_UC
+#load table
+ASV_table <- read.table('../../Combined_datasets/biom_to_txt/Nielsen2014UC.txt', sep="\t", skip=1, header=T, row.names = 1,comment.char = "", quote="", check.names = F)
+#load metadata
+groupings <- read.table('../../Combined_datasets/metadata.txt', sep="\t", row.names = 1, header=T, comment.char = "", quote="", check.names = F)
+sample_num <- length(colnames(ASV_table))
+grouping_num <- length(rownames(groupings))
+colnames(groupings)[1] <- "Groupings"
+if(identical(colnames(ASV_table), rownames(groupings))==T){
+  message("Groupings and ASV table are in the same order")
+}else{
+  rows_to_keep <- intersect(colnames(ASV_table), rownames(groupings))
+  groupings <- groupings[rows_to_keep,,drop=F]
+  ASV_table <- ASV_table[,rows_to_keep]
+  if(identical(colnames(ASV_table), rownames(groupings))==T){
+    message("Groupings table was re-arrange to be in the same order as the ASV table")
+    message("A total of ", sample_num-length(colnames(ASV_table)), " from the ASV_table")
+    message("A total of ", grouping_num-length(rownames(groupings)), " from the groupings table")
+  }else{
+    stop("Unable to match samples between the ASV table and groupings table")
+  }
+}
+
+dds <- DESeqDataSetFromMatrix(countData = ASV_table,
+                              colData=groupings,
+                              design = ~ Groupings)
+
+dds <- DESeq(dds)
+res <- results(dds, contrast=c("Groupings","Healthy","UC"))
+summary(res)
+resOrdered <- res[order(res$pvalue),]
+resSig <- subset(resOrdered, padj < 0.001)
+resSig
+
+write.table(resSig, file='../table/Nielsen_UC_deseq2.txt', quote=FALSE, sep="\t", col.names = NA)
+```
+
+
+```{r}
+#Qin_obesity
+#load table
+ASV_table <- read.table('../../Combined_datasets/biom_to_txt/Qin2010Obesity.txt', sep="\t", skip=1, header=T, row.names = 1,comment.char = "", quote="", check.names = F)
+#load metadata
+groupings <- read.table('../../Combined_datasets/Qin2010Obesity_metadata_simple.txt', sep="\t", row.names = 1, header=T, comment.char = "", quote="", check.names = F)
+sample_num <- length(colnames(ASV_table))
+grouping_num <- length(rownames(groupings))
+colnames(groupings)[1] <- "Groupings"
+if(identical(colnames(ASV_table), rownames(groupings))==T){
+  message("Groupings and ASV table are in the same order")
+}else{
+  rows_to_keep <- intersect(colnames(ASV_table), rownames(groupings))
+  groupings <- groupings[rows_to_keep,,drop=F]
+  ASV_table <- ASV_table[,rows_to_keep]
+  if(identical(colnames(ASV_table), rownames(groupings))==T){
+    message("Groupings table was re-arrange to be in the same order as the ASV table")
+    message("A total of ", sample_num-length(colnames(ASV_table)), " from the ASV_table")
+    message("A total of ", grouping_num-length(rownames(groupings)), " from the groupings table")
+  }else{
+    stop("Unable to match samples between the ASV table and groupings table")
+  }
+}
+
+dds <- DESeqDataSetFromMatrix(countData = ASV_table,
+                              colData=groupings,
+                              design = ~ Groupings)
+
+dds <- DESeq(dds)
+res <- results(dds, contrast=c("Groupings","Healthy","Obesity"))
+summary(res)
+resOrdered <- res[order(res$pvalue),]
+resSig <- subset(resOrdered, padj < 0.001)
+resSig
+
+write.table(resSig, file='../table/Qin_Obesity_deseq2.txt', quote=FALSE, sep="\t", col.names = NA)
+```
+
+```{r}
+#Diabimmune_T1D
+#load table
+ASV_table <- read.table('../../Combined_datasets/biom_to_txt/diabimmune.txt', sep="\t", skip=1, header=T, row.names = 1,comment.char = "", quote="", check.names = F)
+#load metadata
+groupings <- read.table('../../Combined_datasets/metadata.txt', sep="\t", row.names = 1, header=T, comment.char = "", quote="", check.names = F)
+sample_num <- length(colnames(ASV_table))
+grouping_num <- length(rownames(groupings))
+colnames(groupings)[1] <- "Groupings"
+if(identical(colnames(ASV_table), rownames(groupings))==T){
+  message("Groupings and ASV table are in the same order")
+}else{
+  rows_to_keep <- intersect(colnames(ASV_table), rownames(groupings))
+  groupings <- groupings[rows_to_keep,,drop=F]
+  ASV_table <- ASV_table[,rows_to_keep]
+  if(identical(colnames(ASV_table), rownames(groupings))==T){
+    message("Groupings table was re-arrange to be in the same order as the ASV table")
+    message("A total of ", sample_num-length(colnames(ASV_table)), " from the ASV_table")
+    message("A total of ", grouping_num-length(rownames(groupings)), " from the groupings table")
+  }else{
+    stop("Unable to match samples between the ASV table and groupings table")
+  }
+}
+
+dds <- DESeqDataSetFromMatrix(countData = ASV_table,
+                              colData=groupings,
+                              design = ~ Groupings)
+
+dds <- DESeq(dds)
+res <- results(dds, contrast=c("Groupings","Healthy","T1D"))
+summary(res)
+resOrdered <- res[order(res$pvalue),]
+resSig <- subset(resOrdered, padj < 0.001)
+resSig
+
+write.table(resSig, file='../table/T1D_deseq2.txt', quote=FALSE, sep="\t", col.names = NA)
+```
+
+```{r}
+#Qian_PD
+#load table
+ASV_table <- read.table('../../Combined_datasets/biom_to_txt/Qian2020PD.txt', sep="\t", skip=1, header=T, row.names = 1,comment.char = "", quote="", check.names = F)
+#load metadata
+groupings <- read.table('../../Combined_datasets/metadata.txt', sep="\t", row.names = 1, header=T, comment.char = "", quote="", check.names = F)
+sample_num <- length(colnames(ASV_table))
+grouping_num <- length(rownames(groupings))
+colnames(groupings)[1] <- "Groupings"
+if(identical(colnames(ASV_table), rownames(groupings))==T){
+  message("Groupings and ASV table are in the same order")
+}else{
+  rows_to_keep <- intersect(colnames(ASV_table), rownames(groupings))
+  groupings <- groupings[rows_to_keep,,drop=F]
+  ASV_table <- ASV_table[,rows_to_keep]
+  if(identical(colnames(ASV_table), rownames(groupings))==T){
+    message("Groupings table was re-arrange to be in the same order as the ASV table")
+    message("A total of ", sample_num-length(colnames(ASV_table)), " from the ASV_table")
+    message("A total of ", grouping_num-length(rownames(groupings)), " from the groupings table")
+  }else{
+    stop("Unable to match samples between the ASV table and groupings table")
+  }
+}
+
+dds <- DESeqDataSetFromMatrix(countData = ASV_table,
+                              colData=groupings,
+                              design = ~ Groupings)
+
+dds <- DESeq(dds)
+res <- results(dds, contrast=c("Groupings","Healthy","PD"))
+summary(res)
+resOrdered <- res[order(res$pvalue),]
+resSig <- subset(resOrdered, padj < 0.001)
+resSig
+
+write.table(resSig, file='../table/Qian_PD_deseq2.txt', quote=FALSE, sep="\t", col.names = NA)
+```
