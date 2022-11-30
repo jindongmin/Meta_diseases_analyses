@@ -258,6 +258,15 @@ resSig
 ```
 
 ```{r}
+plotCounts(dds, gene='Prevotella sp900547005', intgroup="Groupings")
+```
+
+```{r}
+write.table(res, file='../table/Laske_AD_deseq2_all.txt', quote=FALSE, sep="\t", col.names = NA)
+
+```
+
+```{r}
 write.table(resSig, file='../table/Laske_AD_deseq2.txt', quote=FALSE, sep="\t", col.names = NA)
 ```
 
@@ -295,8 +304,16 @@ summary(res)
 resOrdered <- res[order(res$pvalue),]
 resSig <- subset(resOrdered, padj < 0.001)
 resSig
+```
 
+```{r}
+write.table(res, file='../table/iMSMS_MS_deseq2_all.txt', quote=FALSE, sep="\t", col.names = NA)
+
+```
+
+```{r}
 write.table(resSig, file='../table/iMSMS_MS_deseq2.txt', quote=FALSE, sep="\t", col.names = NA)
+
 ```
 
 ```{r}
