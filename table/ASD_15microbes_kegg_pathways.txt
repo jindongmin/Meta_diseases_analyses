@@ -1,0 +1,7 @@
+Kegg_pathways	Number_of_genes
+Metabolism	4798
+Genetic Information Processing	237
+Environmental Information Processing	539
+Cellular Processes	227
+Organismal Systems	78
+Human Diseases	209
